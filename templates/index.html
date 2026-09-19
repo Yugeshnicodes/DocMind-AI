@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>DocuMind AI</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 280px;
+            background: #111827;
+            color: white;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            color: #9ca3af;
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        .upload-box {
+            border: 1px dashed #6b7280;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .upload-box h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            color: #d1d5db;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .upload-btn {
+            width: 100%;
+            background: white;
+            color: #111827;
+        }
+
+        .clear-btn {
+            width: 100%;
+            margin-top: auto;
+            background: #374151;
+            color: white;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        /* MAIN */
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            color: #111827;
+        }
+
+        .header p {
+            color: #6b7280;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        /* CHAT */
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .welcome {
+            max-width: 700px;
+            margin: 80px auto;
+            text-align: center;
+        }
+
+        .welcome h2 {
+            font-size: 30px;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .message {
+            max-width: 800px;
+            margin: 0 auto 18px auto;
+            padding: 15px 18px;
+            border-radius: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .user-message {
+            background: #111827;
+            color: white;
+        }
+
+        .bot-message {
+            background: white;
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+        }
+
+        .sources {
+            max-width: 800px;
+            margin: -10px auto 20px auto;
+            padding: 10px 15px;
+            background: #eef2ff;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .sources strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* INPUT */
+
+        .input-area {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 18px 30px;
+        }
+
+        .input-box {
+            max-width: 850px;
+            margin: auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        #question {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 13px 15px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        #question:focus {
+            border-color: #6b7280;
+        }
+
+        .send-btn {
+            background: #111827;
+            color: white;
+            min-width: 80px;
+        }
+
+        .loading {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 220px;
+                padding: 15px;
+            }
+
+            .chat-container {
+                padding: 15px;
+            }
+
+            .input-area {
+                padding: 12px;
+            }
+
+            .welcome {
+                margin: 50px auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            DocuMind AI
+        </div>
+
+        <div class="tagline">
+            Intelligent Document Chatbot
+        </div>
+
+
+        <div class="upload-box">
+
+            <h3>
+                Upload Document
+            </h3>
+
+            <input
+                type="file"
+                id="fileInput"
+                accept=".pdf,.docx,.txt"
+            >
+
+            <button
+                class="upload-btn"
+                onclick="uploadDocument()"
+            >
+                Upload
+            </button>
+
+            <div
+                class="status"
+                id="uploadStatus"
+            >
+                PDF, DOCX and TXT supported.
+            </div>
+
+        </div>
+
+
+        <button
+            class="clear-btn"
+            onclick="clearDocuments()"
+        >
+            Clear Documents
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+
+        <header class="header">
+
+            <h1>
+                Ask Your Documents
+            </h1>
+
+            <p>
+                Upload a document and ask questions about its content.
+            </p>
+
+        </header>
+
+
+        <!-- CHAT -->
+
+        <section
+            class="chat-container"
+            id="chatContainer"
+        >
+
+            <div
+                class="welcome"
+                id="welcome"
+            >
+
+                <h2>
+                    Welcome to DocuMind AI
+                </h2>
+
+                <p>
+                    Upload a PDF, DOCX or TXT document
+                    and ask questions based only on
+                    the uploaded content.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- INPUT -->
+
+        <div class="input-area">
+
+            <div class="input-box">
+
+                <input
+                    type="text"
+                    id="question"
+                    placeholder="Ask something about your document..."
+                    onkeydown="handleEnter(event)"
+                >
+
+                <button
+                    class="send-btn"
+                    onclick="askQuestion()"
+                >
+                    Send
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+
+// --------------------------------------------------
+// UPLOAD DOCUMENT
+// --------------------------------------------------
+
+async function uploadDocument() {
+
+    const fileInput =
+        document.getElementById("fileInput");
+
+    const status =
+        document.getElementById("uploadStatus");
+
+    if (!fileInput.files.length) {
+
+        status.innerText =
+            "Please select a file first.";
+
+        return;
+    }
+
+    const file =
+        fileInput.files[0];
+
+    status.innerText =
+        "Uploading and processing document...";
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/upload",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+        const data =
+            await response.json();
+
+
+        if (data.success) {
+
+            status.innerText =
+                data.message +
+                " Chunks created: " +
+                data.chunks;
+
+            addBotMessage(
+                "Document uploaded successfully. You can now ask questions about it."
+            );
+
+        } else {
+
+            status.innerText =
+                data.message;
+        }
+
+
+    } catch (error) {
+
+        status.innerText =
+            "Upload failed. Please try again.";
+
+    }
+
+}
+
+
+// --------------------------------------------------
+// ASK QUESTION
+// --------------------------------------------------
+
+async function askQuestion() {
+
+    const input =
+        document.getElementById("question");
+
+    const question =
+        input.value.trim();
+
+    if (!question) {
+
+        return;
+    }
+
+
+    removeWelcome();
+
+    addUserMessage(
+        question
+    );
+
+    input.value = "";
+
+
+    const loading =
+        addBotMessage(
+            "Thinking..."
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/ask",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        question: question
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        loading.remove();
+
+
+        if (data.success) {
+
+            addBotMessage(
+                data.answer
+            );
+
+
+            if (
+                data.sources &&
+                data.sources.length > 0
+            ) {
+
+                addSources(
+                    data.sources
+                );
+            }
+
+        } else {
+
+            addBotMessage(
+                "Error: " +
+                data.message
+            );
+        }
+
+
+    } catch (error) {
+
+        loading.remove();
+
+        addBotMessage(
+            "Something went wrong. Please try again."
+        );
+
+    }
+
+}
+
+
+// --------------------------------------------------
+// ADD USER MESSAGE
+// --------------------------------------------------
+
+function addUserMessage(message) {
+
+    const container =
+        document.getElementById(
+            "chatContainer"
+        );
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "message user-message";
+
+    div.innerText =
+        message;
+
+    container.appendChild(
+        div
+    );
+
+    scrollToBottom();
+}
+
+
+// --------------------------------------------------
+// ADD BOT MESSAGE
+// --------------------------------------------------
+
+function addBotMessage(message) {
+
+    const container =
+        document.getElementById(
+            "chatContainer"
+        );
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "message bot-message";
+
+    div.innerText =
+        message;
+
+    container.appendChild(
+        div
+    );
+
+    scrollToBottom();
+
+    return div;
+}
+
+
+// --------------------------------------------------
+// ADD SOURCES
+// --------------------------------------------------
+
+function addSources(sources) {
+
+    const container =
+        document.getElementById(
+            "chatContainer"
+        );
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "sources";
+
+
+    let html =
+        "<strong>Sources:</strong>";
+
+
+    sources.forEach(
+        function(source) {
+
+            html +=
+                "<div>" +
+                source.source +
+                " — Page: " +
+                source.page +
+                "</div>";
+
+        }
+    );
+
+
+    div.innerHTML =
+        html;
+
+    container.appendChild(
+        div
+    );
+
+    scrollToBottom();
+}
+
+
+// --------------------------------------------------
+// REMOVE WELCOME
+// --------------------------------------------------
+
+function removeWelcome() {
+
+    const welcome =
+        document.getElementById(
+            "welcome"
+        );
+
+    if (welcome) {
+
+        welcome.remove();
+
+    }
+
+}
+
+
+// --------------------------------------------------
+// ENTER KEY
+// --------------------------------------------------
+
+function handleEnter(event) {
+
+    if (event.key === "Enter") {
+
+        askQuestion();
+
+    }
+
+}
+
+
+// --------------------------------------------------
+// CLEAR DOCUMENTS
+// --------------------------------------------------
+
+async function clearDocuments() {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to clear all documents?"
+        );
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/clear",
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.success) {
+
+            document.getElementById(
+                "chatContainer"
+            ).innerHTML = `
+                <div class="welcome" id="welcome">
+                    <h2>Welcome to DocuMind AI</h2>
+                    <p>
+                        Upload a PDF, DOCX or TXT document
+                        and ask questions about its content.
+                    </p>
+                </div>
+            `;
+
+
+            document.getElementById(
+                "uploadStatus"
+            ).innerText =
+                "All documents cleared.";
+
+        }
+
+    } catch (error) {
+
+        alert(
+            "Could not clear documents."
+        );
+
+    }
+
+}
+
+
+// --------------------------------------------------
+// SCROLL
+// --------------------------------------------------
+
+function scrollToBottom() {
+
+    const container =
+        document.getElementById(
+            "chatContainer"
+        );
+
+    container.scrollTop =
+        container.scrollHeight;
+
+}
+
+
+</script>
+
+</body>
+
+</html>
